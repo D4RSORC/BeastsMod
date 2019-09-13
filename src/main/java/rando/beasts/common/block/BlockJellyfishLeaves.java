@@ -1,79 +1,40 @@
 package rando.beasts.common.block;
 
-import com.google.common.collect.Lists;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockLeaves;
-import net.minecraft.block.BlockPlanks;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.state.BlockStateContainer;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.init.Blocks;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemBlock;
-import net.minecraft.item.ItemBoat;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.BlockRenderLayer;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockAccess;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-import rando.beasts.common.init.BeastsBlocks;
-import rando.beasts.common.init.BeastsItems;
-import rando.beasts.common.utils.BeastsUtil;
-
-import javax.annotation.Nonnull;
-import java.util.List;
 import java.util.Random;
 
-public class BlockJellyfishLeaves extends BlockLeaves {
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.LeavesBlock;
+import net.minecraft.block.SoundType;
+import net.minecraft.block.material.Material;
+import net.minecraft.item.BlockItem;
+import net.minecraft.util.Direction;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IBlockReader;
+import net.minecraft.world.World;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+import rando.beasts.common.init.BeastsBlocks;
+import rando.beasts.common.utils.BeastsUtil;
 
-    public BlockJellyfishLeaves() {
-        this.setSoundType(SoundType.SLIME);
-        BeastsUtil.addToRegistry(this, "jellyleaves", true, ItemBlock::new);
-    }
+public class BlockJellyfishLeaves extends LeavesBlock {
 
-    @Override
-    public void updateTick(World worldIn, BlockPos pos, IBlockState state, Random rand) {}
+	public BlockJellyfishLeaves() {
+		super(Properties.create(Material.LEAVES).sound(SoundType.SLIME).hardnessAndResistance(0.2F));
+		BeastsUtil.addToRegistry(this, "jellyleaves", true, BlockItem::new);
+	}
 
-    @SideOnly(Side.CLIENT)
-    public boolean shouldSideBeRendered(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, EnumFacing side) {
-        IBlockState iblockstate = blockAccess.getBlockState(pos.offset(side));
-        Block block = iblockstate.getBlock();
-        if (blockState != iblockstate) return true;
-        return block != this && super.shouldSideBeRendered(blockState, blockAccess, pos, side);
-    }
+	@Override
+	public void randomTick(BlockState state, World worldIn, BlockPos pos, Random random) {
+	}
 
-    @Override
-    public Item getItemDropped(IBlockState state, Random rand, int fortune) {
-        return Item.getItemFromBlock(BeastsBlocks.JELLYFISH_SAPLING);
-    }
-
-    @Override
-    public boolean isFullCube(IBlockState state) {
-        return false;
-    }
-
-    @Override
-    public boolean isOpaqueCube(IBlockState state) {
-        return false;
-    }
-
-    @Override
-    public BlockRenderLayer getBlockLayer() {
-        return BlockRenderLayer.TRANSLUCENT;
-    }
-
-    @Override
-    public BlockPlanks.EnumType getWoodType(int meta) {
-        return BlockPlanks.EnumType.OAK;
-    }
-
-    @Nonnull
-    @Override
-    public List<ItemStack> onSheared(@Nonnull ItemStack item, IBlockAccess world, BlockPos pos, int fortune) {
-        return Lists.newArrayList();
-    }
+	@OnlyIn(Dist.CLIENT)
+	public static boolean shouldSideBeRendered(BlockState blockState, IBlockReader blockAccess, BlockPos pos,
+			Direction side) {
+		BlockState BlockState = blockAccess.getBlockState(pos.offset(side));
+		Block block = BlockState.getBlock();
+		if (blockState != BlockState)
+			return true;
+		return block != BeastsBlocks.JELLY_LEAVES && Block.shouldSideBeRendered(blockState, blockAccess, pos, side);
+	}
 }

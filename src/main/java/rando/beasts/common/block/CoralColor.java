@@ -1,31 +1,29 @@
 package rando.beasts.common.block;
 
-import net.minecraft.block.material.MapColor;
-import net.minecraft.util.IStringSerializable;
-
-import javax.annotation.Nonnull;
 import java.util.Random;
 
+import javax.annotation.Nonnull;
+
+import net.minecraft.block.material.MaterialColor;
+import net.minecraft.util.IStringSerializable;
+
 public enum CoralColor implements IStringSerializable {
-    BLUE(MapColor.BLUE),
-    PINK(MapColor.PINK),
-    PURPLE(MapColor.PURPLE),
-    RED(MapColor.RED),
-    YELLOW(MapColor.YELLOW);
+	BLUE(MaterialColor.BLUE), PINK(MaterialColor.PINK), PURPLE(MaterialColor.PURPLE), RED(MaterialColor.RED),
+	YELLOW(MaterialColor.YELLOW);
 
-    public MapColor mapColor;
+	public MaterialColor mapColor;
 
-    CoralColor(MapColor color) {
-        this.mapColor = color;
-    }
+	CoralColor(MaterialColor color) {
+		this.mapColor = color;
+	}
 
-    @Nonnull
-    @Override
-    public String getName() {
-        return name().toLowerCase();
-    }
+	@Nonnull
+	@Override
+	public String getName() {
+		return name().toLowerCase();
+	}
 
-    public static CoralColor getRandom(Random rand) {
-        return values()[rand.nextInt(values().length)];
-    }
+	public static CoralColor getRandom(Random rand) {
+		return values()[rand.nextInt(values().length)];
+	}
 }

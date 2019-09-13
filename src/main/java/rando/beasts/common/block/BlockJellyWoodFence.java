@@ -1,13 +1,13 @@
 package rando.beasts.common.block;
 
-import net.minecraft.block.BlockFence;
+import net.minecraft.block.FenceBlock;
 import net.minecraft.block.material.Material;
-import net.minecraft.item.ItemBlock;
+import net.minecraft.item.BlockItem;
 import rando.beasts.common.utils.BeastsUtil;
 
-public class BlockJellyWoodFence extends BlockFence {
-    public BlockJellyWoodFence() {
-        super(Material.WOOD, Material.WOOD.getMaterialMapColor());
-        BeastsUtil.addToRegistry(this, "jellywood_fence", true, ItemBlock::new);
-    }
+public class BlockJellyWoodFence extends FenceBlock {
+	public BlockJellyWoodFence() {
+		super(Properties.create(Material.WOOD, Material.WOOD.getColor()));
+		BeastsUtil.addToRegistry(this, "jellywood_fence", true, BlockItem::new);
+	}
 }

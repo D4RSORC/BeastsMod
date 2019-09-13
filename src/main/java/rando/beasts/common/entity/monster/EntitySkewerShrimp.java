@@ -1,64 +1,60 @@
 package rando.beasts.common.entity.monster;
 
-import net.minecraft.block.Block;
-import net.minecraft.entity.EnumCreatureAttribute;
+import net.minecraft.entity.CreatureAttribute;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.ai.EntityAIAttackMelee;
-import net.minecraft.entity.ai.EntityAIHurtByTarget;
-import net.minecraft.entity.ai.EntityAIPanic;
-import net.minecraft.entity.ai.EntityAISwimming;
-import net.minecraft.entity.ai.EntityAIWander;
-import net.minecraft.entity.monster.EntityMob;
-import net.minecraft.init.SoundEvents;
+import net.minecraft.entity.ai.goal.HurtByTargetGoal;
+import net.minecraft.entity.ai.goal.MeleeAttackGoal;
+import net.minecraft.entity.ai.goal.PanicGoal;
+import net.minecraft.entity.ai.goal.RandomWalkingGoal;
+import net.minecraft.entity.ai.goal.SwimGoal;
+import net.minecraft.entity.monster.MonsterEntity;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.SoundEvent;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.SoundEvents;
 import net.minecraft.world.World;
-import rando.beasts.client.init.BeastsSounds;
-import rando.beasts.common.init.BeastsItems;
 
-public class EntitySkewerShrimp extends EntityMob {
+public class EntitySkewerShrimp extends MonsterEntity {
 
-    public EntitySkewerShrimp(World worldIn) {
-        super(worldIn);
-        this.setSize(0.5f, 0.4f);
-        this.tasks.addTask(0, new EntityAIWander(this, 0.6F));
-        this.targetTasks.addTask(0, new EntityAIHurtByTarget(this, true));
-        this.tasks.addTask(1, new EntityAIAttackMelee(this, 0.6F, true));
-        this.tasks.addTask(2, new EntityAIPanic(this, 0.0D));
-        this.tasks.addTask(3, new EntityAISwimming(this));
-    }
+	public EntitySkewerShrimp(EntityType type, World worldIn) {
+		super(type, worldIn);
+		this.goalSelector.addGoal(0, new RandomWalkingGoal(this, 0.6F));
+		this.targetSelector.addGoal(0, new HurtByTargetGoal(this));
+		this.goalSelector.addGoal(1, new MeleeAttackGoal(this, 0.6F, true));
+		this.goalSelector.addGoal(2, new PanicGoal(this, 0.0D));
+		this.goalSelector.addGoal(3, new SwimGoal(this));
+	}
 
-    @Override
-    protected void applyEntityAttributes() {
-        super.applyEntityAttributes();
-        getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(1F);
-        getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.6F);
-        getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(20);
-    }
+	@Override
+	protected void registerAttributes() {
+		super.registerAttributes();
+		getAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(1F);
+		getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.6F);
+		getAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(20);
+	}
 
-    public EnumCreatureAttribute getCreatureAttribute() {
-        return EnumCreatureAttribute.ARTHROPOD;
-    }
+	@Override
+	public CreatureAttribute getCreatureAttribute() {
+		return CreatureAttribute.ARTHROPOD;
+	}
 
-    @Override
-    protected void dropFewItems(boolean wasRecentlyHit, int lootingModifier) {
-        this.dropItem(isBurning() ? BeastsItems.COOKED_SHRIMP : BeastsItems.SHRIMP, this.rand.nextInt(2) + 1);
-    }
+	@Override
+	protected SoundEvent getAmbientSound() {
+		return SoundEvents.ENTITY_SPIDER_AMBIENT;
+	}
 
-    protected SoundEvent getAmbientSound() {
-        return SoundEvents.ENTITY_SPIDER_AMBIENT;
-    }
+	@Override
+	protected SoundEvent getHurtSound(DamageSource damageSourceIn) {
+		return SoundEvents.ENTITY_SPIDER_HURT;
+	}
 
-    protected SoundEvent getHurtSound(DamageSource damageSourceIn) {
-        return SoundEvents.ENTITY_SPIDER_HURT;
-    }
+	@Override
+	protected SoundEvent getDeathSound() {
+		return SoundEvents.ENTITY_SPIDER_DEATH;
+	}
 
-    protected SoundEvent getDeathSound() {
-        return SoundEvents.ENTITY_SPIDER_DEATH;
-    }
-
-    protected float getSoundVolume() {
-        return 0.4F;
-    }
+	@Override
+	protected float getSoundVolume() {
+		return 0.4F;
+	}
 }

@@ -1,28 +1,23 @@
 package rando.beasts.common.utils;
 
-import java.util.function.Function;
-
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemBlock;
-import rando.beasts.client.init.BeastsCreativeTabs;
+import net.minecraft.item.Item.Properties;
+import rando.beasts.client.init.BeastsItemGroup;
 import rando.beasts.common.init.BeastsBlocks;
 import rando.beasts.common.init.BeastsItems;
 
 public class BeastsUtil {
 
-    public static void addToRegistry(Item item, String name, boolean tab) {
-        item.setUnlocalizedName(name);
-        item.setRegistryName(name);
-        if(tab) item.setCreativeTab(BeastsCreativeTabs.MAIN);
-        BeastsItems.LIST.add(item);
-    }
+	public static void addToRegistry(Item item, String name) {
+		item.setRegistryName(name);
+		BeastsItems.LIST.add(item);
+	}
 
-    public static void addToRegistry(Block block, String name, boolean tab, Function<Block, Item> item) {
-        block.setUnlocalizedName(name);
-        block.setRegistryName(name);
-        if(tab) block.setCreativeTab(BeastsCreativeTabs.MAIN);
-        BeastsBlocks.LIST.add(block);
-        if(item != null && tab) BeastsItems.LIST.add(item.apply(block).setRegistryName(name));
-    }
+	public static void addToRegistry(Block block, String name, boolean tab, ItemFactory<?> item) {
+		block.setRegistryName(name);
+		BeastsBlocks.LIST.add(block);
+		if (item != null && tab)
+			BeastsItems.LIST.add(item.apply(block, new Properties().group(BeastsItemGroup.MAIN)).setRegistryName(name));
+	}
 }

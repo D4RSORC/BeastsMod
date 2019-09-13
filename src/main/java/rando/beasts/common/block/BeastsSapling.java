@@ -1,95 +1,91 @@
 package rando.beasts.common.block;
 
+import java.util.Random;
+
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockBush;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.BushBlock;
 import net.minecraft.block.IGrowable;
 import net.minecraft.block.SoundType;
-import net.minecraft.block.properties.PropertyInteger;
-import net.minecraft.block.state.BlockStateContainer;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.init.Blocks;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemBlock;
-import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.block.material.Material;
+import net.minecraft.block.trees.Tree;
+import net.minecraft.item.BlockItem;
+import net.minecraft.state.IntegerProperty;
+import net.minecraft.state.StateContainer;
+import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockAccess;
+import net.minecraft.util.math.shapes.ISelectionContext;
+import net.minecraft.util.math.shapes.VoxelShape;
+import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
-import net.minecraft.world.gen.feature.WorldGenerator;
 import rando.beasts.common.utils.BeastsUtil;
-
-import javax.annotation.Nullable;
-import java.util.Random;
-import java.util.function.Function;
+import rando.beasts.common.utils.ItemFactory;
 
 @SuppressWarnings("deprecation")
-public class BeastsSapling extends BlockBush implements IGrowable {
+public class BeastsSapling extends BushBlock implements IGrowable {
 
-    static final PropertyInteger STAGE = PropertyInteger.create("stage", 0, 1);
-    static final AxisAlignedBB SAPLING_AABB = new AxisAlignedBB(0.30000001192092896D, 0.0D, 0.30000001192092896D, 0.699999988079071D, 0.6000000238418579D, 0.699999988079071D);
-    private WorldGenerator treeGen;
+	public static final IntegerProperty STAGE = BlockStateProperties.STAGE_0_1;
+	protected static final VoxelShape SHAPE = Block.makeCuboidShape(2.0D, 0.0D, 2.0D, 14.0D, 12.0D, 14.0D);
+	private Tree tree;
 
-    public BeastsSapling(String name, Function<Block, Item> item) {
-        this.setDefaultState(this.blockState.getBaseState().withProperty(STAGE, 0));
-        setHardness(0.6F);
-        setSoundType(SoundType.PLANT);
-        BeastsUtil.addToRegistry(this, name, true, item);
-    }
+	public BeastsSapling(String name, ItemFactory<?> item) {
+		super(Properties.create(Material.PLANTS).doesNotBlockMovement().tickRandomly().sound(SoundType.PLANT)
+				.hardnessAndResistance(0.6F));
+		this.setDefaultState(this.stateContainer.getBaseState().with(STAGE, Integer.valueOf(0)));
+		BeastsUtil.addToRegistry(this, name, true, item);
+	}
 
-    public BeastsSapling(String name, WorldGenerator generator) {
-        this(name, ItemBlock::new);
-        this.treeGen = generator;
-    }
+	public BeastsSapling(String name, Tree tree) {
+		this(name, BlockItem::new);
+		this.tree = tree;
+	}
 
-    @Override
-    protected boolean canSustainBush(IBlockState state) {
-        return state.getBlock() == Blocks.SAND;
-    }
+	@Override
+	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
+		return SHAPE;
+	}
 
-    @Override
-    public void updateTick(World worldIn, BlockPos pos, IBlockState state, Random rand) {
-        if (!worldIn.isRemote) {
-            super.updateTick(worldIn, pos, state, rand);
+	@Override
+	protected boolean isValidGround(BlockState state, IBlockReader worldIn, BlockPos pos) {
+		return state.getBlock() == Blocks.SAND;
+	}
 
-            if (!worldIn.isAreaLoaded(pos, 1)) return;
-            if (worldIn.getLightFromNeighbors(pos.up()) >= 9 && rand.nextInt(7) == 0) this.grow(worldIn, rand, pos, state);
-        }
-    }
+	@Override
+	public void tick(BlockState state, World worldIn, BlockPos pos, Random random) {
+		if (!worldIn.isRemote) {
+			super.tick(state, worldIn, pos, random);
+			if (!worldIn.isAreaLoaded(pos, 1))
+				return;
+			if (worldIn.getLight(pos.up()) >= 9 && random.nextInt(7) == 0)
+				this.grow(worldIn, random, pos, state);
+		}
+	}
 
-    @Override
-    @Nullable
-    public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, IBlockAccess worldIn, BlockPos pos) {
-        return NULL_AABB;
-    }
+	@Override
+	public boolean canGrow(IBlockReader worldIn, BlockPos pos, BlockState state, boolean isClient) {
+		return true;
+	}
 
-    @Override
-    public boolean canGrow(World worldIn, BlockPos pos, IBlockState state, boolean isClient) {
-        return true;
-    }
+	@Override
+	public boolean canUseBonemeal(World worldIn, Random rand, BlockPos pos, BlockState state) {
+		return worldIn.rand.nextFloat() < 0.45;
+	}
 
-    @Override
-    public boolean canUseBonemeal(World worldIn, Random rand, BlockPos pos, IBlockState state) {
-        return worldIn.rand.nextFloat() < 0.45;
-    }
+	@Override
+	public void grow(World worldIn, Random rand, BlockPos pos, BlockState state) {
+		if (state.get(STAGE) == 0)
+			worldIn.setBlockState(pos, state.cycle(STAGE), 4);
+		generateTree(worldIn, pos, state, rand);
+	}
 
-    @Override
-    public void grow(World worldIn, Random rand, BlockPos pos, IBlockState state) {
-        if (state.getValue(STAGE) == 0) worldIn.setBlockState(pos, state.cycleProperty(STAGE), 4);
-        else generateTree(worldIn, pos, state, rand);
-    }
+	protected void generateTree(World worldIn, BlockPos pos, BlockState state, Random rand) {
+		if (tree != null)
+			tree.spawn(worldIn, pos, state, rand);
+	}
 
-    protected void generateTree(World worldIn, BlockPos pos, IBlockState state, Random rand) {
-        if(treeGen != null) treeGen.generate(worldIn, rand, pos);
-    }
-
-    public IBlockState getStateFromMeta(int meta) {
-        return this.getDefaultState().withProperty(STAGE, (meta & 8) >> 3);
-    }
-
-    public int getMetaFromState(IBlockState state) {
-        return state.getValue(STAGE) << 3;
-    }
-
-    protected BlockStateContainer createBlockState() {
-        return new BlockStateContainer(this, STAGE);
-    }
+	@Override
+	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
+		builder.add(STAGE);
+	}
 }

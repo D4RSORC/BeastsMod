@@ -1,128 +1,118 @@
 package rando.beasts.common.world.gen.structure;
 
-import java.util.List;
 import java.util.Random;
+import java.util.function.Function;
 
-import javax.annotation.Nonnull;
+import com.mojang.datafixers.Dynamic;
 
-import com.google.common.collect.Lists;
-
-import net.minecraft.init.Biomes;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.SharedSeedRandom;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.World;
-import net.minecraft.world.gen.feature.WorldGenerator;
-import net.minecraft.world.gen.structure.StructureBoundingBox;
-import net.minecraft.world.gen.structure.StructureComponent;
-import net.minecraft.world.gen.structure.StructureStart;
+import net.minecraft.util.math.MutableBoundingBox;
+import net.minecraft.world.biome.Biome;
+import net.minecraft.world.gen.ChunkGenerator;
+import net.minecraft.world.gen.feature.Feature;
+import net.minecraft.world.gen.feature.NoFeatureConfig;
+import net.minecraft.world.gen.feature.structure.MarginedStructureStart;
+import net.minecraft.world.gen.feature.structure.Structure;
+import net.minecraft.world.gen.feature.template.TemplateManager;
 
-public class RabbitVillageGenerator extends WorldGenerator {
+public class RabbitVillageGenerator extends Structure<NoFeatureConfig> {
+//TODO
+	public RabbitVillageGenerator(Function<Dynamic<?>, ? extends NoFeatureConfig> configFactoryIn) {
+		super(configFactoryIn);
+	}
 
-    private static ChunkPos[] structureCoords = new ChunkPos[128];
-    private static int generated = 0;
+	private static ChunkPos[] structureCoords = new ChunkPos[128];
+	private static int generated = 0;
 
-    private static boolean canSpawnStructureAtCoords(World world, int chunkX, int chunkZ) {
-        int[] p = getRandomPos(world, chunkX, chunkZ);
-        int k = p[0];
-        int l = p[1];
-        if (chunkX == k && chunkZ == l) return world.getBiomeProvider().areBiomesViable(chunkX * 16 + 8, chunkZ * 16 + 8, 0, Lists.newArrayList(Biomes.PLAINS));
-        return false;
-    }
+	@Override
+	protected ChunkPos getStartPositionForPosition(ChunkGenerator<?> chunkGenerator, Random random, int x, int z,
+			int spacingOffsetsX, int spacingOffsetsZ) {
+		int i = chunkGenerator.getSettings().getVillageDistance();
+		int j = chunkGenerator.getSettings().getVillageSeparation();
+		int k = x + i * spacingOffsetsX;
+		int l = z + i * spacingOffsetsZ;
+		int i1 = k < 0 ? k - i + 1 : k;
+		int j1 = l < 0 ? l - i + 1 : l;
+		int k1 = i1 / i;
+		int l1 = j1 / i;
+		((SharedSeedRandom) random).setLargeFeatureSeedWithSalt(chunkGenerator.getSeed(), k1, l1, 10387312);
+		k1 = k1 * i;
+		l1 = l1 * i;
+		k1 = k1 + random.nextInt(i - j);
+		l1 = l1 + random.nextInt(i - j);
+		return new ChunkPos(k1, l1);
+	}
 
-    public static BlockPos getNearestStructurePos(World worldIn, BlockPos pos) {
-        BlockPos blockpos = null;
-        BlockPos.MutableBlockPos mutableBlockPos = new BlockPos.MutableBlockPos(worldIn.getChunkFromBlockCoords(pos).getPos().getBlock(0, 0, 0));
-        double d0 = Double.MAX_VALUE;
-        for (ChunkPos chunkpos : structureCoords) {
-            if(chunkpos != null) {
-                mutableBlockPos.setPos((chunkpos.x << 4) + 8, 32, (chunkpos.z << 4) + 8);
-                double d1 = mutableBlockPos.distanceSq(pos);
-                if (blockpos == null) {
-                    blockpos = new BlockPos(mutableBlockPos);
-                    d0 = d1;
-                } else if (d1 < d0) {
-                    blockpos = new BlockPos(mutableBlockPos);
-                    d0 = d1;
-                }
-            }
-        }
-        return blockpos;
-    }
+	@Override
+	public boolean hasStartAt(ChunkGenerator<?> chunkGen, Random rand, int chunkPosX, int chunkPosZ) {
+		ChunkPos chunkpos = this.getStartPositionForPosition(chunkGen, rand, chunkPosX, chunkPosZ, 0, 0);
+		if (chunkPosX == chunkpos.x && chunkPosZ == chunkpos.z) {
+			Biome biome = chunkGen.getBiomeProvider()
+					.getBiome(new BlockPos((chunkPosX << 4) + 9, 0, (chunkPosZ << 4) + 9));
+			return chunkGen.hasStructure(biome, Feature.VILLAGE);
+		} else {
+			return false;
+		}
+	}
 
-    private static int[] getRandomPos(World worldIn, int a, int b) {
-        int j1 = a;
-        int k1 = b;
-        if (j1 < 0) j1 -= 31;
-        if (k1 < 0) k1 -= 31;
-        int l1 = j1 / 32;
-        int i2 = k1 / 32;
-        Random rand = worldIn.setRandomSeed(l1, i2, 1351);
-        return new int[] {(l1 * 32) + rand.nextInt(24), (i2 * 32) + rand.nextInt(24)};
-    }
+	@Override
+	public IStartFactory getStartFactory() {
+		return RabbitVillageGenerator.Start::new;
+	}
 
-    @Nonnull
-    private StructureStart getStructureStart(World world, int chunkX, int chunkZ, Random rand) {
-        return new RabbitVillageGenerator.Start(world, rand, chunkX, chunkZ);
-    }
+	@Override
+	public String getStructureName() {
+		return "RabbitVillage";
+	}
 
-    @SuppressWarnings("SuspiciousToArrayCall")
-    @Override
-    public boolean generate(@Nonnull World worldIn, @Nonnull Random rand, @Nonnull BlockPos position) {
-        boolean canSpawn = canSpawnStructureAtCoords(worldIn, position.getX() >> 4, position.getZ() >> 4);
-        if(rand.nextInt(1351) == 0) {
-            this.getStructureStart(worldIn, position.getX() >> 4, position.getZ() >> 4, rand).generateStructure(worldIn, rand, new StructureBoundingBox(position.getX() - 48, position.getZ() - 48, position.getX() + 48, position.getZ() + 48));
-            if(structureCoords.length-1 < generated) structureCoords = Lists.asList(structureCoords, new ChunkPos[generated + 1]).toArray(new ChunkPos[0]);
-            structureCoords[generated++] = worldIn.getChunkFromBlockCoords(position).getPos();
-        }
-        return canSpawn;
-    }
+	@Override
+	public int getSize() {
+		return 8;
+	}
 
-    public static class Start extends StructureStart {
-        private boolean hasMoreThanTwoComponents;
+	public static class Start extends MarginedStructureStart {
+		private boolean hasMoreThanTwoComponents;
 
-        @SuppressWarnings("unused")
-        public Start(){}
+		@SuppressWarnings("unused")
+		public Start(Structure<?> structureIn, int chunkX, int chunkZ, Biome biomeIn, MutableBoundingBox boundsIn,
+				int referenceIn, long seed) {
+			super(structureIn, chunkX, chunkZ, biomeIn, boundsIn, referenceIn, seed);
+		}
 
-        Start(World worldIn, Random rand, int x, int z) {
-            super(x, z);
-            List<StructureRabbitVillagePieces.PieceWeight> list = StructureRabbitVillagePieces.getStructureVillageWeightedPieceList(rand);
-            StructureRabbitVillagePieces.Start start = new StructureRabbitVillagePieces.Start(worldIn.getBiomeProvider(), rand, (x << 4) + 2, (z << 4) + 2, list, 2);
-            this.components.add(start);
-            start.buildComponent(start, this.components, rand);
-            List<StructureComponent> list1 = start.pendingRoads;
-            List<StructureComponent> list2 = start.pendingHouses;
+//        Start(World worldIn, Random rand, int x, int z) {
+//        	
+//            super(x, z);
+//            List<StructureRabbitVillagePieces.PieceWeight> list = StructureRabbitVillagePieces.getStructureVillageWeightedPieceList(rand);
+//            StructureRabbitVillagePieces.Start start = new StructureRabbitVillagePieces.Start(worldIn.getChunkProvider(), rand, (x << 4) + 2, (z << 4) + 2, list, 2);
+//            this.components.add(start);
+//            start.buildComponent(start, this.components, rand);
+//            List<StructureComponent> list1 = start.pendingRoads;
+//            List<StructureComponent> list2 = start.pendingHouses;
+//
+//            while (!list1.isEmpty() || !list2.isEmpty()) {
+//                if (list1.isEmpty()) {
+//                    int i = rand.nextInt(list2.size());
+//                    StructureComponent component = list2.remove(i);
+//                    component.buildComponent(start, this.components, rand);
+//                } else {
+//                    int j = rand.nextInt(list1.size());
+//                    StructureComponent component = list1.remove(j);
+//                    component.buildComponent(start, this.components, rand);
+//                }
+//            }
+//
+//            this.updateBoundingBox();
+//            int k = 0;
+//            for (StructureComponent component : this.components) if (!(component instanceof StructureRabbitVillagePieces.Path)) ++k;
+//            this.hasMoreThanTwoComponents = k > 2;
+//        }
 
-            while (!list1.isEmpty() || !list2.isEmpty()) {
-                if (list1.isEmpty()) {
-                    int i = rand.nextInt(list2.size());
-                    StructureComponent component = list2.remove(i);
-                    component.buildComponent(start, this.components, rand);
-                } else {
-                    int j = rand.nextInt(list1.size());
-                    StructureComponent component = list1.remove(j);
-                    component.buildComponent(start, this.components, rand);
-                }
-            }
+		@Override
+		public void init(ChunkGenerator<?> generator, TemplateManager templateManagerIn, int chunkX, int chunkZ,
+				Biome biomeIn) {
 
-            this.updateBoundingBox();
-            int k = 0;
-            for (StructureComponent component : this.components) if (!(component instanceof StructureRabbitVillagePieces.Path)) ++k;
-            this.hasMoreThanTwoComponents = k > 2;
-        }
-
-        public boolean isSizeableStructure() {
-            return this.hasMoreThanTwoComponents;
-        }
-
-        public void writeToNBT(NBTTagCompound tagCompound) {
-            super.writeToNBT(tagCompound);
-            tagCompound.setBoolean("Valid", this.hasMoreThanTwoComponents);
-        }
-
-        public void readFromNBT(NBTTagCompound tagCompound) {
-            super.readFromNBT(tagCompound);
-            this.hasMoreThanTwoComponents = tagCompound.getBoolean("Valid");
-        }
-    }
+		}
+	}
 }

@@ -1,11 +1,14 @@
 package rando.beasts.common.item;
 
-import net.minecraft.item.ItemFood;
-import rando.beasts.common.utils.BeastsUtil;
+import net.minecraft.item.Food;
+import rando.beasts.client.init.BeastsItemGroup;
 
-public class BeastsFood extends ItemFood {
-    public BeastsFood(String name, int amount, float saturation) {
-        super(amount, saturation, false);
-        BeastsUtil.addToRegistry(this, name, true);
-    }
+public class BeastsFood extends BeastsItem {
+	public BeastsFood(String name, Food food) {
+		super(name, new Properties().group(BeastsItemGroup.MAIN).food(food));
+	}
+
+	public BeastsFood(String name, Properties properties, Food food) {
+		super(name, properties.group(BeastsItemGroup.MAIN).food(food));
+	}
 }

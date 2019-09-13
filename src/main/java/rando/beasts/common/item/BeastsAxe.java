@@ -1,24 +1,24 @@
 package rando.beasts.common.item;
 
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.item.ItemAxe;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.item.AxeItem;
+import net.minecraft.item.IItemTier;
 import net.minecraft.item.ItemStack;
+import rando.beasts.client.init.BeastsItemGroup;
 import rando.beasts.common.utils.BeastsUtil;
 
-import javax.annotation.Nullable;
+public class BeastsAxe extends AxeItem {
 
-public class BeastsAxe extends ItemAxe {
+	private BeastsToolSet kit;
 
-    private BeastsToolSet kit;
+	public BeastsAxe(IItemTier tier, String name, float attackDamageIn, float attackSpeedIn, BeastsToolSet kit) {
+		super(tier, attackDamageIn, attackSpeedIn, new Properties().group(BeastsItemGroup.MAIN));
+		this.kit = kit;
+		BeastsUtil.addToRegistry(this, name);
+	}
 
-    public BeastsAxe(ToolMaterial material, String name, @Nullable BeastsToolSet kit) {
-        super(material);
-        this.kit = kit;
-        BeastsUtil.addToRegistry(this, name, true);
-    }
-
-    @Override
-    public boolean hitEntity(ItemStack stack, EntityLivingBase target, EntityLivingBase attacker) {
-        return (kit != null && kit.damageEntity(stack, target, attacker)) || super.hitEntity(stack, target, attacker);
-    }
+	@Override
+	public boolean hitEntity(ItemStack stack, LivingEntity target, LivingEntity attacker) {
+		return (kit != null && kit.damageEntity(stack, target, attacker)) || super.hitEntity(stack, target, attacker);
+	}
 }

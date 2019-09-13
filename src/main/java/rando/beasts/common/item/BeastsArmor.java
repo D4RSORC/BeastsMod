@@ -1,29 +1,32 @@
 package rando.beasts.common.item;
 
-import net.minecraft.client.model.ModelBiped;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.inventory.EntityEquipmentSlot;
-import net.minecraft.item.ItemArmor;
+import net.minecraft.client.renderer.entity.model.BipedModel;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.inventory.EquipmentSlotType;
+import net.minecraft.item.ArmorItem;
+import net.minecraft.item.IArmorMaterial;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+import rando.beasts.client.init.BeastsItemGroup;
 import rando.beasts.common.main.BeastsMod;
 import rando.beasts.common.utils.BeastsUtil;
 
-public class BeastsArmor extends ItemArmor {
+public class BeastsArmor extends ArmorItem {
 
-	public BeastsArmor(String name, ArmorMaterial material, int renderIndex, EntityEquipmentSlot armorType) {
-		super(material, renderIndex, armorType);
-		BeastsUtil.addToRegistry(this, name, true);
+	public BeastsArmor(String name, IArmorMaterial material, EquipmentSlotType armorType) {
+		super(material, armorType, new Properties().group(BeastsItemGroup.MAIN));
+		BeastsUtil.addToRegistry(this, name);
 	}
 
-	@Override 	
-	@SideOnly(Side.CLIENT)
-	public ModelBiped getArmorModel(EntityLivingBase entityLiving, ItemStack itemStack, EntityEquipmentSlot armorSlot, ModelBiped defaultModel) {
-		ModelBiped armorModel = BeastsMod.proxy.getArmorModel(this, armorSlot);
-		if(armorModel != null) {
+	@Override
+	@OnlyIn(Dist.CLIENT)
+	public BipedModel getArmorModel(LivingEntity entityLiving, ItemStack itemStack, EquipmentSlotType armorSlot,
+			BipedModel defaultModel) {
+		BipedModel armorModel = BeastsMod.proxy.getArmorModel(this, armorSlot);
+		if (armorModel != null) {
 			armorModel.isSneak = defaultModel.isSneak;
-			armorModel.isRiding = defaultModel.isRiding;
+			armorModel.isSitting = defaultModel.isSitting;
 			armorModel.isChild = defaultModel.isChild;
 			armorModel.rightArmPose = defaultModel.rightArmPose;
 			armorModel.leftArmPose = defaultModel.leftArmPose;

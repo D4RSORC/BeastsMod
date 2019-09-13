@@ -3,11 +3,13 @@ package rando.beasts.common.init;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.minecraft.item.crafting.IRecipe;
+import net.minecraft.item.crafting.IRecipeSerializer;
+import net.minecraft.item.crafting.SpecialRecipeSerializer;
 import rando.beasts.common.item.crafting.RecipeCoconutJuice;
 
 public class BeastsRecipes {
-    public static final List<IRecipe> LIST = new ArrayList<>();
+	public static final List<IRecipeSerializer<?>> LIST = new ArrayList<>();
 
-    public static final IRecipe COCONUT_JUICE = new RecipeCoconutJuice();
+	public static final IRecipeSerializer<RecipeCoconutJuice> COCONUT_JUICE = new SpecialRecipeSerializer<RecipeCoconutJuice>(
+			RecipeCoconutJuice::new);
 }

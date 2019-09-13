@@ -1,0 +1,10 @@
+{
+	"forge_marker": 1,
+	"defaults": { "model": "beasts:block/coral/sapling/purple" },
+    "variants": {        
+        "stage": {
+        	"0": {},
+        	"1": {}
+        }
+    }
+}

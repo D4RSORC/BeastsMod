@@ -1,33 +1,38 @@
 package rando.beasts.client.renderer.entity.layers;
 
-import net.minecraft.client.renderer.GlStateManager;
+import com.mojang.blaze3d.platform.GlStateManager;
+
 import net.minecraft.client.renderer.entity.layers.LayerRenderer;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+import rando.beasts.client.model.ModelPufferFishDog;
 import rando.beasts.client.renderer.entity.RenderPufferfishDog;
 import rando.beasts.common.entity.passive.EntityPufferfishDog;
 import rando.beasts.common.utils.BeastsReference;
 
-@SideOnly(Side.CLIENT)
-public class LayerCollar implements LayerRenderer<EntityPufferfishDog> {
-    private static final ResourceLocation COLLAR = new ResourceLocation(BeastsReference.ID, "textures/entity/pufferfish_dog/collar.png");
-    private final RenderPufferfishDog render;
+@OnlyIn(Dist.CLIENT)
+public class LayerCollar extends LayerRenderer<EntityPufferfishDog, ModelPufferFishDog> {
+	private static final ResourceLocation COLLAR = new ResourceLocation(BeastsReference.ID,
+			"textures/entity/pufferfish_dog/collar.png");
 
-    public LayerCollar(RenderPufferfishDog render) {
-        this.render = render;
-    }
+	public LayerCollar(RenderPufferfishDog render) {
+		super(render);
+	}
 
-    public void doRenderLayer(EntityPufferfishDog entity, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
-        if (entity.isTamed() && !entity.isInvisible()) {
-            this.render.bindTexture(COLLAR);
-            float[] colors = entity.getCollarColor().getColorComponentValues();
-            GlStateManager.color(colors[0], colors[1], colors[2]);
-            this.render.getMainModel().render(entity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);
-        }
-    }
+	@Override
+	public void render(EntityPufferfishDog entity, float limbSwing, float limbSwingAmount, float partialTicks,
+			float ageInTicks, float netHeadYaw, float headPitch, float scale) {
+		if (entity.isTamed() && !entity.isInvisible()) {
+			this.bindTexture(COLLAR);
+			float[] colors = entity.getCollarColor().getColorComponentValues();
+			GlStateManager.color3f(colors[0], colors[1], colors[2]);
+			this.getEntityModel().render(entity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);
+		}
+	}
 
-    public boolean shouldCombineTextures() {
-        return true;
-    }
+	@Override
+	public boolean shouldCombineTextures() {
+		return true;
+	}
 }

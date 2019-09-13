@@ -1,7 +1,7 @@
 package rando.beasts.client.proxy;
 
-import net.minecraft.client.model.ModelBiped;
-import net.minecraft.inventory.EntityEquipmentSlot;
+import net.minecraft.client.renderer.entity.model.BipedModel;
+import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.Item;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
@@ -57,8 +57,9 @@ public class ClientProxy extends CommonProxy {
 	}
 
 	@Override
-	public ModelBiped getArmorModel(Item armorItem, EntityEquipmentSlot armorSlot) {
-		if(armorItem == BeastsItems.SPARTAPOD_HELMET && armorSlot == EntityEquipmentSlot.HEAD) return SPARTAPOD;
+	public BipedModel getArmorModel(Item armorItem, EquipmentSlotType armorSlot) {
+		if (armorItem == BeastsItems.SPARTAPOD_HELMET && armorSlot == EquipmentSlotType.HEAD)
+			return SPARTAPOD;
 		return null;
 	}
 }

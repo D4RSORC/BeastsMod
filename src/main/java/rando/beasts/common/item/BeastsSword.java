@@ -1,28 +1,36 @@
 package rando.beasts.common.item;
 
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemSword;
-import rando.beasts.common.utils.BeastsUtil;
-
 import javax.annotation.Nullable;
 
-public class BeastsSword extends ItemSword {
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.item.IItemTier;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.SwordItem;
+import rando.beasts.client.init.BeastsItemGroup;
+import rando.beasts.common.utils.BeastsUtil;
 
-    private BeastsToolSet kit;
+public class BeastsSword extends SwordItem {
 
-    public BeastsSword(ToolMaterial material, String name, @Nullable BeastsToolSet kit) {
-        super(material);
-        this.kit = kit;
-        BeastsUtil.addToRegistry(this, name, true);
-    }
+	private BeastsToolSet kit;
 
-    public BeastsSword(ToolMaterial material, String name) {
-        this(material, name, null);
-    }
+	public BeastsSword(IItemTier material, String name, int attackDamageIn, float attackSpeedIn, Properties properties,
+			@Nullable BeastsToolSet kit) {
+		super(material, attackDamageIn, attackSpeedIn, properties.group(BeastsItemGroup.MAIN));
+		this.kit = kit;
+		BeastsUtil.addToRegistry(this, name);
+	}
 
-    @Override
-    public boolean hitEntity(ItemStack stack, EntityLivingBase target, EntityLivingBase attacker) {
-        return (kit != null && kit.damageEntity(stack, target, attacker)) || super.hitEntity(stack, target, attacker);
-    }
+	public BeastsSword(IItemTier material, String name, int attackDamageIn, float attackSpeedIn,
+			@Nullable BeastsToolSet kit) {
+		this(material, name, attackDamageIn, attackSpeedIn, new Properties(), kit);
+	}
+
+	public BeastsSword(IItemTier material, String name, int attackDamageIn, float attackSpeedIn) {
+		this(material, name, attackDamageIn, attackSpeedIn, null);
+	}
+
+	@Override
+	public boolean hitEntity(ItemStack stack, LivingEntity target, LivingEntity attacker) {
+		return (kit != null && kit.damageEntity(stack, target, attacker)) || super.hitEntity(stack, target, attacker);
+	}
 }

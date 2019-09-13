@@ -1,52 +1,47 @@
 package rando.beasts.common.command;
 
-import java.util.Collections;
-import java.util.List;
-
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
-import net.minecraft.command.CommandBase;
+import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+
 import net.minecraft.command.CommandException;
-import net.minecraft.command.ICommandSender;
-import net.minecraft.command.WrongUsageException;
-import net.minecraft.server.MinecraftServer;
+import net.minecraft.command.CommandSource;
+import net.minecraft.command.Commands;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextComponentTranslation;
-import rando.beasts.common.world.gen.structure.RabbitVillageGenerator;
+import net.minecraft.util.text.TranslationTextComponent;
 
-public class CommandLocateStructure extends CommandBase {
+public class CommandLocateStructure {
 
-    @Nonnull
-    public String getName() {
-        return "locate";
-    }
+	static String structures[] = { "Stronghold", "Monument", "Village", "Mansion", "EndCity", "Fortress", "Temple",
+			"Mineshaft", "RabbitVillage" };
 
-    public int getRequiredPermissionLevel() {
-        return 2;
-    }
+	@Nonnull
+	public String getName() {
+		return "locate";
+	}
 
-    @Nonnull
-    public String getUsage(@Nonnull ICommandSender sender) {
-        return "/locateVillage";
-    }
+	public static void register(CommandDispatcher<CommandSource> dispatcher) {
+		LiteralArgumentBuilder<CommandSource> literalargumentbuilder = Commands.literal("locateVillage")
+				.requires((player) -> player.hasPermissionLevel(2));
+		for (String s : structures) {
+			literalargumentbuilder.then(Commands.literal(s).executes((sender) -> findStructure(sender, s)));
+		}
 
-    public void execute(@Nonnull MinecraftServer server, @Nonnull ICommandSender sender, String[] args) throws CommandException {
-        if (args.length != 1) {
-            throw new WrongUsageException("commands.locate.usage");
-        } else {
-            String s = args[0];
-            BlockPos blockpos = s.equals("RabbitVillage")? RabbitVillageGenerator.getNearestStructurePos(sender.getEntityWorld(), sender.getPosition()):sender.getEntityWorld().findNearestStructure(s, sender.getPosition(), false);
-            if (blockpos != null) {
-                sender.sendMessage(new TextComponentTranslation("commands.locate.success", s, blockpos.getX(), blockpos.getZ()));
-            } else {
-                throw new CommandException("commands.locate.failure", s);
-            }
-        }
-    }
+		dispatcher.register(literalargumentbuilder);
+	}
 
-    @Nonnull
-    public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, @Nullable BlockPos targetPos) {
-        return args.length == 1 ? getListOfStringsMatchingLastWord(args, "Stronghold", "Monument", "Village", "Mansion", "EndCity", "Fortress", "Temple", "Mineshaft", "RabbitVillage") : Collections.emptyList();
-    }
+	private static int findStructure(CommandContext<CommandSource> sender, String s) throws CommandSyntaxException {
+		BlockPos blockpos = sender.getSource().getWorld().findNearestStructure(s,
+				sender.getSource().asPlayer().getPosition(), 1000, false);
+		if (blockpos != null) {
+			sender.getSource().sendFeedback(
+					new TranslationTextComponent("commands.locate.success", s, blockpos.getX(), blockpos.getZ()), true);
+		} else {
+			throw new CommandException(new TranslationTextComponent("commands.locate.failure", s));
+		}
+		return 1;
+	}
 }

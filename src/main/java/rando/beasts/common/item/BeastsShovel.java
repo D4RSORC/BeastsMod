@@ -1,24 +1,27 @@
 package rando.beasts.common.item;
 
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.item.ItemSpade;
-import net.minecraft.item.ItemStack;
-import rando.beasts.common.utils.BeastsUtil;
-
 import javax.annotation.Nullable;
 
-public class BeastsShovel extends ItemSpade {
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.item.IItemTier;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.ShovelItem;
+import rando.beasts.client.init.BeastsItemGroup;
+import rando.beasts.common.utils.BeastsUtil;
 
-    private BeastsToolSet kit;
+public class BeastsShovel extends ShovelItem {
 
-    public BeastsShovel(ToolMaterial material, String name, @Nullable BeastsToolSet kit) {
-        super(material);
-        this.kit = kit;
-        BeastsUtil.addToRegistry(this, name, true);
-    }
+	private BeastsToolSet kit;
 
-    @Override
-    public boolean hitEntity(ItemStack stack, EntityLivingBase target, EntityLivingBase attacker) {
-        return (kit != null && kit.damageEntity(stack, target, attacker)) || super.hitEntity(stack, target, attacker);
-    }
+	public BeastsShovel(IItemTier material, String name, float attackDamageIn, float attackSpeedIn,
+			@Nullable BeastsToolSet kit) {
+		super(material, attackDamageIn, attackSpeedIn, new Properties().group(BeastsItemGroup.MAIN));
+		this.kit = kit;
+		BeastsUtil.addToRegistry(this, name);
+	}
+
+	@Override
+	public boolean hitEntity(ItemStack stack, LivingEntity target, LivingEntity attacker) {
+		return (kit != null && kit.damageEntity(stack, target, attacker)) || super.hitEntity(stack, target, attacker);
+	}
 }

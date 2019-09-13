@@ -1,117 +1,85 @@
 package rando.beasts.common.block;
 
+import java.util.Random;
+
+import javax.annotation.Nullable;
+
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockBush;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.BushBlock;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.properties.PropertyBool;
-import net.minecraft.block.properties.PropertyInteger;
-import net.minecraft.block.state.BlockFaceShape;
-import net.minecraft.block.state.BlockStateContainer;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.monster.EntitySkeleton;
-import net.minecraft.init.Blocks;
-import net.minecraft.init.MobEffects;
-import net.minecraft.potion.PotionEffect;
-import net.minecraft.util.BlockRenderLayer;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.potion.EffectInstance;
+import net.minecraft.potion.Effects;
+import net.minecraft.state.BooleanProperty;
+import net.minecraft.state.IntegerProperty;
+import net.minecraft.state.StateContainer;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockAccess;
+import net.minecraft.util.math.shapes.ISelectionContext;
+import net.minecraft.util.math.shapes.VoxelShape;
+import net.minecraft.util.math.shapes.VoxelShapes;
+import net.minecraft.world.IBlockReader;
+import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import rando.beasts.common.init.BeastsBlocks;
 import rando.beasts.common.utils.BeastsUtil;
 
-import javax.annotation.Nullable;
-import java.util.Random;
+public class BlockTentacle extends BushBlock {
 
-public class BlockTentacle extends BlockBush {
+	public static final IntegerProperty SIZE = IntegerProperty.create("size", 1, 8);
+	public static final BooleanProperty FULL = BooleanProperty.create("full");
+	private static final AxisAlignedBB[] BOUNDING_BOXES = new AxisAlignedBB[8];
 
-    public static final PropertyInteger SIZE = PropertyInteger.create("size", 1, 8);
-    public static final PropertyBool FULL = PropertyBool.create("full");
-    private static final AxisAlignedBB[] BOUNDING_BOXES = new AxisAlignedBB[8];
+	public BlockTentacle() {
+		super(Properties.create(Material.PLANTS).doesNotBlockMovement());
+		this.setDefaultState(this.getDefaultState().with(SIZE, 8).with(FULL, false));
+		BeastsUtil.addToRegistry(this, "tentacle", false, null);
+	}
 
-    public BlockTentacle() {
-        this.setDefaultState(this.getDefaultState().withProperty(SIZE, 8).withProperty(FULL, false));
-        BeastsUtil.addToRegistry(this, "tentacle", false, null);
-    }
+	@Override
+	public boolean isValidPosition(BlockState state, IWorldReader worldIn, BlockPos pos) {
+		Block block = worldIn.getBlockState(pos.up()).getBlock();
+		return block == BeastsBlocks.JELLY_LEAVES || block == this;
+	}
 
-    @Override
-    public boolean canBlockStay(World worldIn, BlockPos pos, IBlockState state) {
-        Block block = worldIn.getBlockState(pos.up()).getBlock();
-        return block == BeastsBlocks.JELLY_LEAVES || block == this;
-    }
+	@Override
+	public void tick(BlockState state, World worldIn, BlockPos pos, Random random) {
+		super.tick(state, worldIn, pos, random);
 
-    @Override
-    public void updateTick(World worldIn, BlockPos pos, IBlockState state, Random rand) {
-        super.updateTick(worldIn, pos, state, rand);
+	}
 
-    }
+	@Override
+	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
+		int index = state.get(SIZE) - 1;
+		if (BOUNDING_BOXES[index] == null)
+			BOUNDING_BOXES[index] = new AxisAlignedBB(0.375, 1, 0.375, 0.625, 1 - ((index + 1) * 0.125), 0.625);
+		return VoxelShapes.create(BOUNDING_BOXES[index]);
+	}
 
-    @Override
-    public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
-        int index = state.getValue(SIZE)-1;
-        if(BOUNDING_BOXES[index] == null) BOUNDING_BOXES[index] = new AxisAlignedBB(0.375, 1, 0.375, 0.625, 1 - ((index + 1) * 0.125), 0.625);
-        return BOUNDING_BOXES[index];
-    }
+	@Override
+	@Nullable
+	public VoxelShape getCollisionShape(BlockState state, IBlockReader worldIn, BlockPos pos,
+			ISelectionContext context) {
+		return VoxelShapes.empty();
+	}
 
-    @Override
-    @Nullable
-    public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, IBlockAccess worldIn, BlockPos pos) {
-        return NULL_AABB;
-    }
+	@Override
+	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
+		builder.add(SIZE, FULL);
+	}
 
-    public boolean isOpaqueCube(IBlockState state)
-    {
-        return false;
-    }
-
-    public boolean isFullCube(IBlockState state)
-    {
-        return false;
-    }
-
-    @SideOnly(Side.CLIENT)
-    public BlockRenderLayer getBlockLayer()
-    {
-        return BlockRenderLayer.CUTOUT;
-    }
-
-    @Override
-    protected BlockStateContainer createBlockState() {
-        return new BlockStateContainer(this, SIZE, FULL);
-    }
-
-    @Override
-    public void onEntityCollidedWithBlock(World worldIn, BlockPos pos, IBlockState state, Entity entityIn) {
-        super.onEntityCollidedWithBlock(worldIn, pos, state, entityIn);
-        if(entityIn instanceof EntityLivingBase) {
-            EntityLivingBase entity = (EntityLivingBase) entityIn;
-            if(!entity.isPotionActive(MobEffects.POISON)) {
-                PotionEffect effect = new PotionEffect(MobEffects.POISON, 100);
-                if(entity.isPotionApplicable(effect)) entity.addPotionEffect(effect);
-            }
-        }
-    }
-
-    @Override
-    public IBlockState getStateFromMeta(int meta) {
-        int i = meta + 1;
-        boolean full = i > 8;
-        return getDefaultState().withProperty(SIZE, full ? i - 8 : i).withProperty(FULL, full);
-    }
-
-    @Override
-    public int getMetaFromState(IBlockState state) {
-        return state.getValue(SIZE) + (state.getValue(FULL) ? 8 : 0) - 1;
-    }
-
-    public BlockFaceShape getBlockFaceShape(IBlockAccess worldIn, IBlockState state, BlockPos pos, EnumFacing face) {
-        return BlockFaceShape.UNDEFINED;
-    }
+	@Override
+	public void onEntityCollision(BlockState state, World worldIn, BlockPos pos, Entity entityIn) {
+		super.onEntityCollision(state, worldIn, pos, entityIn);
+		if (entityIn instanceof LivingEntity) {
+			LivingEntity entity = (LivingEntity) entityIn;
+			if (!entity.isPotionActive(Effects.POISON)) {
+				EffectInstance effect = new EffectInstance(Effects.POISON, 100);
+				if (entity.isPotionApplicable(effect))
+					entity.addPotionEffect(effect);
+			}
+		}
+	}
 }

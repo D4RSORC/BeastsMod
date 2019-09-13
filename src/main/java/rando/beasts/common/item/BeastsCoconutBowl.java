@@ -1,25 +1,26 @@
 package rando.beasts.common.item;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.item.Food;
 import net.minecraft.item.ItemStack;
-import net.minecraft.potion.PotionEffect;
+import net.minecraft.potion.EffectInstance;
 import net.minecraft.world.World;
 import rando.beasts.common.init.BeastsItems;
 
 public class BeastsCoconutBowl extends BeastsFood {
 
-    private final PotionEffect[] effects;
+	private final EffectInstance[] effects;
 
-    public BeastsCoconutBowl(String name, int amount, float saturation, PotionEffect... effects) {
-        super(name, amount, saturation);
-        this.effects = effects;
-        setMaxStackSize(2);
-    }
+	public BeastsCoconutBowl(String name, Food food, EffectInstance... effects) {
+		super(name, new Properties().maxStackSize(2), food);
+		this.effects = effects;
+	}
 
-    @Override
-    protected void onFoodEaten(ItemStack stack, World worldIn, EntityPlayer player) {
-        for(PotionEffect effect : effects) player.addPotionEffect(effect);
-        player.inventory.add(1, new ItemStack(BeastsItems.COCONUT_BOWL));
-        super.onFoodEaten(stack, worldIn, player);
-    }
+	@Override
+	public ItemStack onItemUseFinish(ItemStack stack, World worldIn, LivingEntity entityLiving) {
+		super.onItemUseFinish(stack, worldIn, entityLiving);
+		for (EffectInstance effect : effects)
+			entityLiving.addPotionEffect(effect);
+		return new ItemStack(BeastsItems.COCONUT_BOWL);
+	}
 }
