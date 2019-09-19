@@ -14,13 +14,19 @@ import net.minecraft.world.gen.ChunkGenerator;
 import net.minecraft.world.gen.GenerationSettings;
 import net.minecraft.world.gen.GenerationStage;
 import net.minecraft.world.gen.Heightmap;
+import net.minecraft.world.gen.feature.AbstractTreeFeature;
 import net.minecraft.world.gen.feature.Feature;
 import net.minecraft.world.gen.feature.IFeatureConfig;
 import net.minecraft.world.gen.feature.NoFeatureConfig;
+import net.minecraft.world.gen.feature.TreeFeature;
 import net.minecraft.world.gen.surfacebuilders.SurfaceBuilder;
+import net.minecraft.world.World;
+import rando.beasts.common.block.BlockCoral;
 import rando.beasts.common.block.CoralColor;
+import rando.beasts.common.entity.monster.EntityWhippingBarnacle;
 import rando.beasts.common.init.BeastsBlocks;
 import rando.beasts.common.world.gen.feature.WorldGenJellyfishTrees;
+import rando.beasts.common.world.gen.feature.WorldGenPalmTrees;
 
 public class BiomeDriedReef extends BeastsBiome {
 
@@ -28,10 +34,10 @@ public class BiomeDriedReef extends BeastsBiome {
 	private static final WorldGenBlob ANDESITE_GENERATOR = new WorldGenBlob(Blocks.ANDESITE.getDefaultState());
 	private static final WorldGenBlob CORAL_BLOCK_GENERATOR = new WorldGenCoralBlock();
 	private static final WorldGenCoralPlant CORAL_PLANT_GENERATOR = new WorldGenCoralPlant();
-	private static final WorldGenJellyfishTrees JELLYFISH_TREE_GENERATOR = new WorldGenJellyfishTrees(
-			NoFeatureConfig::deserialize, false);
-	private static final Feature[] GENERATORS = { ROCK_GENERATOR, ANDESITE_GENERATOR, CORAL_BLOCK_GENERATOR,
-			CORAL_PLANT_GENERATOR };
+	private static final WorldGenJellyfishTrees JELLYFISH_TREE_GENERATOR = new WorldGenJellyfishTrees(NoFeatureConfig::deserialize, false);
+	private static final WorldGenPalmTrees PALM_TREE_GENERATOR = new WorldGenPalmTrees(NoFeatureConfig::deserialize, false);
+	private static final Feature[] CORALS = {CORAL_BLOCK_GENERATOR, CORAL_PLANT_GENERATOR};
+	private static final WorldGenBlob[] ROCKS = {ROCK_GENERATOR, ANDESITE_GENERATOR};
 
 	public BiomeDriedReef() {
 		super("dried_reef", new Biome.Builder().surfaceBuilder(SurfaceBuilder.DEFAULT, SurfaceBuilder.SAND_CONFIG)
@@ -39,28 +45,30 @@ public class BiomeDriedReef extends BeastsBiome {
 				.downfall(0.0F).temperature(2).waterColor(0x00FFFF).waterFogColor(329011).parent((String) null));
 	}
 
+	
+	public AbstractTreeFeature<NoFeatureConfig> getRandomTreeFeature(Random rand) {
+        return rand.nextInt(10) == 0 ? JELLYFISH_TREE_GENERATOR : PALM_TREE_GENERATOR;
+    }
+		
 	@Override
-	public void decorate(GenerationStage.Decoration stage, ChunkGenerator<? extends GenerationSettings> chunkGenerator,
-			IWorld worldIn, long seed, SharedSeedRandom rand, BlockPos pos) {
-		int i = rand.nextInt(4);
-		for (int j = 0; j < i; ++j) {
-			int k = rand.nextInt(16) + 8;
-			int l = rand.nextInt(16) + 8;
-			BlockPos blockpos = worldIn.getHeight(Heightmap.Type.WORLD_SURFACE, pos.add(k, 0, l));
-			GENERATORS[rand.nextInt(GENERATORS.length)].place(worldIn, chunkGenerator, rand, pos,
-					IFeatureConfig.NO_FEATURE_CONFIG);
-		}
-		if (rand.nextInt(1000) == 0)
-			JELLYFISH_TREE_GENERATOR.place(worldIn, chunkGenerator, rand, pos, IFeatureConfig.NO_FEATURE_CONFIG);
+	public void decorate(GenerationStage.Decoration stage, ChunkGenerator<? extends GenerationSettings> chunkGenerator, IWorld worldIn, long seed, SharedSeedRandom rand, BlockPos pos) {
+		for (int i = 0; i < rand.nextInt(4); ++i) CORALS[rand.nextInt(CORALS.length)].place(worldIn, chunkGenerator, rand, worldIn.getHeight(Heightmap.Type.MOTION_BLOCKING,pos.add(rand.nextInt(16) + 8, 0, rand.nextInt(16) + 8)), IFeatureConfig.NO_FEATURE_CONFIG);
+        for (int i = 0; i < rand.nextInt(2); ++i) ROCKS[rand.nextInt(ROCKS.length)].place(worldIn, chunkGenerator, rand, worldIn.getHeight(Heightmap.Type.MOTION_BLOCKING,pos.add(rand.nextInt(16) + 8, 0, rand.nextInt(16) + 8)), IFeatureConfig.NO_FEATURE_CONFIG);
+        if(rand.nextInt(15) == 0) getRandomTreeFeature(rand).place(worldIn, chunkGenerator, rand,  worldIn.getHeight(Heightmap.Type.MOTION_BLOCKING, pos.add(rand.nextInt(16) + 8, 0, rand.nextInt(16) + 8)), IFeatureConfig.NO_FEATURE_CONFIG);
 		super.decorate(stage, chunkGenerator, worldIn, seed, rand, pos);
 	}
 
 	private static class WorldGenBlob extends Feature<NoFeatureConfig> {
 		private BlockState block;
+		private int size;
 
-		WorldGenBlob(BlockState blockIn) {
+		WorldGenBlob(BlockState blockIn, int size) {
 			super(NoFeatureConfig::deserialize);
 			this.block = blockIn;
+			this.size = size;
+		}
+		WorldGenBlob(BlockState blockIn) {
+			this(blockIn, 0);
 		}
 
 		@Override
@@ -75,9 +83,9 @@ public class BiomeDriedReef extends BeastsBiome {
 			}
 			final BlockPos pos = position;
 			for (int i = 0; i < 3; ++i) {
-				int j = rand.nextInt(2);
-				int k = rand.nextInt(2);
-				int l = rand.nextInt(2);
+				int j = rand.nextInt(2 + size);
+				int k = rand.nextInt(2 + size);
+				int l = rand.nextInt(2 + size);
 				float f = (j + k + l) * 0.333F + 0.5F;
 				BlockPos.getAllInBox(position.add(-j, -k, -l), position.add(j, k, l))
 						.filter(blockpos -> (blockpos.distanceSq(pos) <= f * f

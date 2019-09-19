@@ -7,16 +7,13 @@
   ],
   "key": {
     "#": {
-      "item": "beasts:coral_essence",
-      "data": 0
+      "item": "beasts:coral_essence_blue"
     },
     "c": {
-      "item": "beasts:coral_block",
-      "data": 0
+      "item": "beasts:coral_block_blue"
     }
   },
   "result": {
-    "item": "beasts:coral_sapling",
-    "data": 0
+    "item": "beasts:coral_sapling_blue"
   }
 }

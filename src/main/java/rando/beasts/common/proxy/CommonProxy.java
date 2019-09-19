@@ -26,4 +26,8 @@ public class CommonProxy {
 	public BipedModel getArmorModel(Item armorItem, EquipmentSlotType armorSlot) {
 		return null;
 	}
+
+	public String getArmorTexture(Item armorItem, EquipmentSlotType armorSlot){
+		return null;
+	}
 }

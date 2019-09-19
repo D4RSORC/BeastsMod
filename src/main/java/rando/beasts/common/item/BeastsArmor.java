@@ -1,6 +1,9 @@
 package rando.beasts.common.item;
 
+import javax.annotation.Nullable;
+
 import net.minecraft.client.renderer.entity.model.BipedModel;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.ArmorItem;
@@ -18,6 +21,11 @@ public class BeastsArmor extends ArmorItem {
 		super(material, armorType, new Properties().group(BeastsItemGroup.MAIN));
 		BeastsUtil.addToRegistry(this, name);
 	}
+	
+	public BeastsArmor(String name, IArmorMaterial material, EquipmentSlotType armorType, Properties properties) {
+		super(material, armorType, properties.group(BeastsItemGroup.MAIN));
+		BeastsUtil.addToRegistry(this, name);
+	}
 
 	@Override
 	@OnlyIn(Dist.CLIENT)
@@ -32,5 +40,11 @@ public class BeastsArmor extends ArmorItem {
 			armorModel.leftArmPose = defaultModel.leftArmPose;
 		}
 		return armorModel;
+	}
+
+	@Nullable
+	@Override
+	public String getArmorTexture(ItemStack stack, Entity entity, EquipmentSlotType slot, String type) {
+		return BeastsMod.proxy.getArmorTexture(this, slot);
 	}
 }

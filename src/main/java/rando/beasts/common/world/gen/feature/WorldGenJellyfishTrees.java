@@ -28,8 +28,7 @@ public class WorldGenJellyfishTrees extends AbstractTreeFeature<NoFeatureConfig>
 	private static final BlockState LEAF = BeastsBlocks.JELLY_LEAVES.getDefaultState();
 
 	@Override
-	public boolean place(Set<BlockPos> changedBlocks, IWorldGenerationReader worldIn, Random rand, BlockPos position,
-			MutableBoundingBox boundsIn) {
+	public boolean place(Set<BlockPos> changedBlocks, IWorldGenerationReader worldIn, Random rand, BlockPos position, MutableBoundingBox boundsIn) {
 		if (worldIn.hasBlockState(position, (state) -> state.getBlock() == Blocks.SAND)) {
 			int height = rand.nextInt(3) + 4;
 			int radius = rand.nextInt(5) + 8;

@@ -88,8 +88,7 @@ public class EntityCoconutCrab extends MonsterEntity {
 
 	@Override
 	public void knockBack(Entity entityIn, float strength, double xRatio, double zRatio) {
-		if (isOut())
-			super.knockBack(entityIn, strength, xRatio, zRatio);
+		if (isOut()) super.knockBack(entityIn, strength, xRatio, zRatio);
 	}
 
 	@Override

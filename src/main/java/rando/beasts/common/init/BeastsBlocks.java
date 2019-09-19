@@ -19,9 +19,11 @@ import rando.beasts.common.block.BlockJellyWoodFence;
 import rando.beasts.common.block.BlockJellyWoodFenceGate;
 import rando.beasts.common.block.BlockJellyfisLog;
 import rando.beasts.common.block.BlockJellyfishLeaves;
+import rando.beasts.common.block.BlockPalmTreeLeaves;
 import rando.beasts.common.block.BlockTentacle;
 import rando.beasts.common.block.CoralColor;
-import rando.beasts.common.world.gen.feature.JellyFishTree;
+import rando.beasts.common.world.gen.feature.JellyfishTree;
+import rando.beasts.common.world.gen.feature.PalmTree;
 
 public class BeastsBlocks {
 
@@ -30,14 +32,17 @@ public class BeastsBlocks {
 	public static final Block COCONUT = new BlockCoconut();
 	public static final Block GLOW_ROOT_TOP = new BlockGlowRoot(true);
 	public static final Block GLOW_ROOT_BOTTOM = new BlockGlowRoot(false);
-	public static final Block JELLYFISH_SAPLING = new BeastsSapling("jellyfish_sapling", new JellyFishTree());
+	public static final Block JELLYFISH_SAPLING = new BeastsSapling("jellyfish_sapling", new JellyfishTree());
+	public static final Block PALM_SAPLING = new BeastsSapling("palm_sapling", new PalmTree());
 	public static final Block TENTACLE = new BlockTentacle();
+	public static final Block PALM_LEAVES = new BlockPalmTreeLeaves();
 	public static final Block JELLY_WOOD = new BlockJellyfisLog();
 	public static final Block JELLY_LEAVES = new BlockJellyfishLeaves();
 	public static final Block JELLY_WOOD_PLANKS = new BeastsBlock(Material.WOOD, "jellywood_planks");
 	public static final Block JELLY_WOOD_DOOR = new BlockJellyWoodDoor();
 	public static final Block JELLY_WOOD_FENCE = new BlockJellyWoodFence();
 	public static final Block JELLY_WOOD_GATE = new BlockJellyWoodFenceGate();
+	public static final Block HERMIT_SHELL = new BeastsBlock(Material.WOOD, "hermit_shell");
 	// this is a map so any coral plant can be gotten by the color or index/ordinal
 	public static final Map<CoralColor, BlockCoralPlant> CORAL_PLANTS = new HashMap<>();
 	public static final Map<CoralColor, BlockCoral> CORAL_BLOCKS = new HashMap<>();

@@ -138,4 +138,8 @@ public class BlockCoralPlant extends SixWayBlock {
 	public boolean allowsMovement(BlockState state, IBlockReader worldIn, BlockPos pos, PathType type) {
 		return false;
 	}
+	
+	public CoralColor getColor() {
+		return this.color;
+	}
 }

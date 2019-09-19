@@ -9,7 +9,11 @@
     "entity.beasts.giant_garden_eel": "Giant Garden Eel",
 
     "entity.beasts.beasts_painting": "Beasts Painting",
-    "entity.beasts.branchie": "Branchie",
+    "entity.coral_branchie": "Coral Branchie",
+	"entity.chorus_branchie": "Chorus Branchie",
+	"entity.beasts.wood_branchie": "Wood Branchie",
+	"entity.beasts.whipping_barnacle": "Whipping Barnacle",
+	"entity.beasts.hermit_turtle": "Hermit Turtle",
 
 
     "item.beasts.reef_mixture": "Reef Mixture",
@@ -47,6 +51,11 @@
     "item.beasts.spartapod_chest": "Spartapod Chestplate",
     "item.beasts.spartapod_legs": "Spartapod Leggings",
     "item.beasts.spartapod_boots": "Spartapod Boots",
+	"item.beasts.puffer_helmet": "Puffer Helmet",
+	"item.beasts.puffer_chest": "Puffer Chestplate",
+	"item.beasts.puffer_legs": "Puffer Leggings",
+	"item.beasts.puffer_boots": "Puffer Boots",
+	"item.beasts.puffer_scale": "Puffer Scale",
     "item.beasts.coconut_rabbit_stew": "Rabbit Stew",
     "item.beasts.coconut_mushroom": "Mushroom Stew",
     "item.beasts.coconut_juice": "Coconut Juice",
@@ -93,6 +102,8 @@
     "block.beasts.jellywood_gate": "Jellywood Fence Gate",
     "block.beasts.jellywood_door": "Jellywood Door",
     "block.beasts.jellyfish_sapling": "Jellyfish Sapling",
+	"block.beasts.palm_sapling": "Palm Tree Sapling",
+	"block.beasts.hermit_shell": "Hermit Shell",
 
 
     "itemGroup.beasts": "Beasts",

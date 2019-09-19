@@ -1,6 +1,6 @@
 {
 	"forge_marker": 1,
-	"defaults": { "model": "beasts:block/coral/sapling/purple" },
+	"defaults": { "model": "beasts:block/coral/sapling/blue" },
     "variants": {        
         "stage": {
         	"0": {},

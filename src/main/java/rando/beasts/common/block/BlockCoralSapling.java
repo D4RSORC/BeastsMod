@@ -124,13 +124,6 @@ public class BlockCoralSapling extends BeastsSapling {
 		return true;
 	}
 
-	/**
-	 * Update the provided state given the provided neighbor facing and neighbor
-	 * state, returning a new state. For example, fences make their connections to
-	 * the passed in state if possible, and wet concrete powder immediately returns
-	 * its solidified counterpart. Note that this method should ideally consider
-	 * only the specific face passed in.
-	 */
 	@Override
 	public BlockState updatePostPlacement(BlockState stateIn, Direction facing, BlockState facingState, IWorld worldIn,
 			BlockPos currentPos, BlockPos facingPos) {
@@ -171,11 +164,6 @@ public class BlockCoralSapling extends BeastsSapling {
 		}
 	}
 
-	/**
-	 * Gets the render layer this block will render on. SOLID for solid blocks,
-	 * CUTOUT or CUTOUT_MIPPED for on-off transparency (glass, reeds), TRANSLUCENT
-	 * for fully blended transparency (stained glass)
-	 */
 	@Override
 	public BlockRenderLayer getRenderLayer() {
 		return BlockRenderLayer.CUTOUT;

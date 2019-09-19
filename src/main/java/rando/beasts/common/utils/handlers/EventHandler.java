@@ -1,8 +1,12 @@
 package rando.beasts.common.utils.handlers;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ai.goal.NearestAttackableTargetGoal;
 import net.minecraft.entity.ai.goal.NonTamedTargetGoal;
@@ -22,6 +26,11 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
 import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 import rando.beasts.common.command.CommandLocateStructure;
+import net.minecraftforge.event.world.BlockEvent;
+import net.minecraftforge.fml.common.Mod;
+import rando.beasts.common.entity.monster.EntityBranchieBase;
+import rando.beasts.common.entity.monster.EntityCoralBranchie;
+
 import rando.beasts.common.entity.passive.EntityPufferfishDog;
 import rando.beasts.common.entity.passive.EntityRabbitman;
 import rando.beasts.common.init.BeastsTriggers;
@@ -94,4 +103,25 @@ public class EventHandler {
 	public static void registerCommands(FMLServerStartingEvent event) {
 		CommandLocateStructure.register(event.getCommandDispatcher());
 	}
+
+    @SubscribeEvent
+    public static void breakBlock(BlockEvent.BreakEvent event) {
+        Function<BlockEvent.BreakEvent, ? extends EntityBranchieBase> createFunc = null;
+        BlockState state = event.getState();
+        Block block = state.getBlock();
+        for (Collection<? extends Block> blocks : EntityBranchieBase.TYPES.keySet()) {
+            if(blocks.contains(block)) {
+                createFunc = EntityBranchieBase.TYPES.get(blocks);
+                break;
+            }
+        }
+        if(createFunc != null && !event.getWorld().isRemote() && event.getPlayer().getRNG().nextBoolean() && event.getWorld().getBlockState(event.getPos().down()).getBlock() != block) {
+            EntityBranchieBase entity = createFunc.apply(event);
+            if(entity != null) {
+                entity.scream();
+                entity.setAttackTarget(event.getPlayer());
+                event.getWorld().addEntity(entity);
+            }
+        }
+    }
 }

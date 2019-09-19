@@ -8,8 +8,6 @@ import net.minecraft.item.BlockItem;
 public class BlockCoral extends BeastsBlock {
 
 	public BlockCoral(CoralColor color) {
-		super(Properties.create(Material.PLANTS).hardnessAndResistance(0.6F).sound(SoundType.PLANT),
-				"coral_block_" + color.getName(), true, BlockItem::new);
+		super(Properties.create(Material.PLANTS, color.mapColor).hardnessAndResistance(0.6F).sound(SoundType.PLANT), "coral_block_" + color.getName(), true, BlockItem::new);
 	}
-
 }

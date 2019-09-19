@@ -3,9 +3,9 @@ package rando.beasts.client.model;
 import net.minecraft.client.renderer.entity.model.EntityModel;
 import net.minecraft.client.renderer.entity.model.RendererModel;
 import net.minecraft.util.math.MathHelper;
-import rando.beasts.common.entity.monster.EntityBranchie;
+import rando.beasts.common.entity.monster.EntityBranchieBase;
 
-public class ModelBranchie extends EntityModel<EntityBranchie> {
+public class ModelBranchie<T extends EntityBranchieBase> extends EntityModel<T> {
 	public RendererModel body;
 	public RendererModel legLeft;
 	public RendererModel legRight;
@@ -56,7 +56,7 @@ public class ModelBranchie extends EntityModel<EntityBranchie> {
 	}
 
 	@Override
-	public void setRotationAngles(EntityBranchie entityIn, float limbSwing, float limbSwingAmount, float ageInTicks,
+	public void setRotationAngles(T entityIn, float limbSwing, float limbSwingAmount, float ageInTicks,
 			float netHeadYaw, float headPitch, float scaleFactor) {
 		super.setRotationAngles(entityIn, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scaleFactor);
 		float speed = 0.55f, degree = 0.75f;
@@ -71,7 +71,7 @@ public class ModelBranchie extends EntityModel<EntityBranchie> {
 	}
 
 	@Override
-	public void render(EntityBranchie entityIn, float limbSwing, float limbSwingAmount, float ageInTicks,
+	public void render(T entityIn, float limbSwing, float limbSwingAmount, float ageInTicks,
 			float netHeadYaw, float headPitch, float scale) {
 		this.body.render(scale);
 	}

@@ -23,24 +23,17 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
-import rando.beasts.client.init.BeastsSounds;
+import net.minecraftforge.event.world.BlockEvent;
+import rando.beasts.common.block.BlockCoralPlant;
 import rando.beasts.common.block.CoralColor;
+import rando.beasts.common.init.BeastsEntities;
 
-public class EntityBranchie extends CreatureEntity {
+public class EntityCoralBranchie extends EntityBranchieBase {
 
-	private static final DataParameter<Integer> VARIANT = EntityDataManager.createKey(EntityBranchie.class,
-			DataSerializers.VARINT);
+	private static final DataParameter<Integer> VARIANT = EntityDataManager.createKey(EntityCoralBranchie.class, DataSerializers.VARINT);
 
-	public EntityBranchie(EntityType type, World worldIn) {
+	public EntityCoralBranchie(EntityType type, World worldIn) {
 		super(type, worldIn);
-	}
-
-	@Override
-	protected void registerGoals() {
-		this.goalSelector.addGoal(0, new SwimGoal(this));
-		this.goalSelector.addGoal(1, new WaterAvoidingRandomWalkingGoal(this, 0.5D));
-		this.goalSelector.addGoal(2, new LookAtGoal(this, PlayerEntity.class, 6.0F));
-		this.goalSelector.addGoal(4, new LookRandomlyGoal(this));
 	}
 
 	@Override
@@ -84,15 +77,6 @@ public class EntityBranchie extends CreatureEntity {
 		return super.attackEntityAsMob(entityIn);
 	}
 
-	public void scream() {
-		playSound(BeastsSounds.BRANCHIE_SCREAM, getSoundVolume(), getSoundPitch());
-	}
-
-	@Override
-	protected float getSoundVolume() {
-		return 0.4F;
-	}
-
 	@Override
 	public void writeAdditional(CompoundNBT compound) {
 		super.writeAdditional(compound);
@@ -104,4 +88,14 @@ public class EntityBranchie extends CreatureEntity {
 		super.readAdditional(compound);
 		this.setVariant(CoralColor.values()[compound.getInt("variant")]);
 	}
+
+    public static EntityCoralBranchie create(BlockEvent.BreakEvent event) {
+    	IWorld world = event.getWorld();
+        EntityCoralBranchie entity = new EntityCoralBranchie(BeastsEntities.CORAL_BRANCHIE,world.getWorld());
+        BlockPos pos = event.getPos();
+        entity.setLocationAndAngles(pos.getX(), pos.getY(), pos.getZ(), 0, 0);
+        entity.onInitialSpawn(world,world.getDifficultyForLocation(pos), SpawnReason.EVENT, null, null);
+        entity.setVariant(((BlockCoralPlant)event.getState().getBlock()).getColor());
+        return entity;
+    }
 }

@@ -3,8 +3,7 @@
   "ingredients": [ {
       "item": "minecraft:bone"
     }, {
-      "type": "forge:ore_dict",
-      "ore": "treeLeaves"
+      "tag": "leaves"
     }
   ],
   "result": {

@@ -5,6 +5,7 @@ import java.util.UUID;
 import javax.annotation.Nonnull;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.AgeableEntity;
 import net.minecraft.entity.Entity;
@@ -102,7 +103,7 @@ public class EntityPufferfishDog extends TameableEntity {
 		this.dataManager.register(THREAT_TIME, 0.0f);
 	}
 
-	protected void playStepSound(BlockPos pos, Block blockIn) {
+	protected void playStepSound(BlockPos pos, BlockState blockIn) {
 		this.playSound(SoundEvents.ENTITY_WOLF_STEP, 0.15F, 1.0F);
 	}
 

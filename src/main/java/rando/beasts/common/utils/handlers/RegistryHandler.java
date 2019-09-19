@@ -3,21 +3,31 @@ package rando.beasts.common.utils.handlers;
 import java.util.function.Supplier;
 
 import net.minecraft.block.Block;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.EntityType;
+import net.minecraft.inventory.container.ContainerType;
 import net.minecraft.item.Item;
 import net.minecraft.item.crafting.IRecipeSerializer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.SoundEvent;
+import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
+import net.minecraftforge.client.event.ModelRegistryEvent;
+import net.minecraftforge.client.model.ModelLoader;
+import net.minecraftforge.common.extensions.IForgeContainerType;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
 import rando.beasts.client.init.BeastsSounds;
+import rando.beasts.common.entity.passive.EntityLandwhale;
 import rando.beasts.common.init.BeastsBlocks;
+import rando.beasts.common.init.BeastsContainers;
 import rando.beasts.common.init.BeastsEntities;
 import rando.beasts.common.init.BeastsItems;
+import rando.beasts.common.inventory.ContainerLandwhaleInventory;
+import rando.beasts.common.main.BeastsMod;
 import rando.beasts.common.tileentity.TileEntityCoconut;
 import rando.beasts.common.utils.BeastsReference;
 
@@ -77,4 +87,10 @@ public class RegistryHandler {
 		// event.getRegistry().registerAll(BeastsRecipes.LIST.toArray(new
 		// IRecipeSerializer<?>[0]));
 	}
+	
+	@SubscribeEvent
+	public static void registerContainers(RegistryEvent.Register<ContainerType<?>> event)
+    {
+        event.getRegistry().register(BeastsContainers.LANDWHALE.setRegistryName("landwhale_inventory"));
+    }
 }
